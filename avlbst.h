@@ -140,15 +140,12 @@ protected:
     // Add helper functions here
 		void leftRotate(AVLNode<Key,Value>* n);
 		void rightRotate(AVLNode<Key,Value>* n);
-		void remove(AVLNode<Key, Value>* temp);
 };
 
 template<class Key, class Value>
 void AVLTree<Key, Value>::leftRotate(AVLNode<Key,Value>* n) {
 	AVLNode<Key, Value>* R = n->getRight();
-	//AVLNode<Key, Value>* L = n->getLeft();
 	AVLNode<Key, Value>* RL = R->getLeft();
-	//AVLNode<Key, Value>* RR = R->getRight();
 
 	if (n->getParent()==NULL) {
 		this->root_ = R;
@@ -168,12 +165,8 @@ void AVLTree<Key, Value>::leftRotate(AVLNode<Key,Value>* n) {
 		R->setParent(n->getParent());
 		R->setLeft(n);
     n->setParent(R);
-    //n->setLeft(L);
-    //if(L != NULL) L->setParent(n);
     n->setRight(RL);
     if(RL != NULL) RL->setParent(n);
-    //R->setRight(RR);
-    //if(RR != NULL) RR->setParent(R);
 	}
 	//update balance
 	int nb = -1 * std::max(0,(int)R->getBalance()) - 1 + n->getBalance();
@@ -187,9 +180,7 @@ void AVLTree<Key, Value>::leftRotate(AVLNode<Key,Value>* n) {
 
 template<class Key, class Value>
 void AVLTree<Key, Value>::rightRotate(AVLNode<Key,Value>* n) {
-	//AVLNode<Key, Value>* R = n->getRight();
 	AVLNode<Key, Value>* L = n->getLeft();
-	//AVLNode<Key, Value>* LL = L->getLeft();
 	AVLNode<Key, Value>* LR = L->getRight();
 	if (n->getParent()==NULL) {
 		this->root_ = L;
@@ -198,10 +189,6 @@ void AVLTree<Key, Value>::rightRotate(AVLNode<Key,Value>* n) {
 		n->setParent(L);
 		n->setLeft(LR);
 		if(LR!=NULL) LR->setParent(n);
-		//L->setLeft(LL);
-		//if (LL!=NULL) LL->setParent(L);
-		//n->setRight(R);
-    //if(R != NULL) R->setParent(n);
 	}
 	else {
 		if (((n->getParent())->getRight())==n) {
@@ -215,10 +202,6 @@ void AVLTree<Key, Value>::rightRotate(AVLNode<Key,Value>* n) {
 		n->setParent(L);
 		n->setLeft(LR);
 		if(LR!=NULL) LR->setParent(n);
-		//L->setLeft(LL);
-		//if (LL!=NULL) LL->setParent(L);
-		//n->setRight(R);
-    //if(R != NULL) R->setParent(n);
 	}
 	//update balances
 	int Lb = L->getBalance();
@@ -295,73 +278,6 @@ void AVLTree<Key, Value>::insert (const std::pair<const Key, Value> &new_item)
   return;
 }
 
-
-//helper function
-template<typename Key, typename Value>
-void AVLTree<Key, Value>::remove(AVLNode<Key, Value>* temp)
-{
-    // TODO
-    if (temp == NULL) return;
-    if (temp->getLeft()==NULL && temp->getRight()==NULL) {//leaf node
-      AVLNode<Key, Value>* temp_parent = temp->getParent();
-      if (temp_parent!=NULL) {//has parent node
-        if (temp_parent->getLeft() == temp) {//left child
-          temp_parent->setLeft(NULL);
-        }
-        else if (temp_parent->getRight() == temp){//right child
-          temp_parent->setRight(NULL);
-        }
-      }
-      else {//empty tree after removal
-        this->root_ = NULL;
-      }
-      delete temp;
-    }
-    else if (temp->getLeft()==NULL) {//single child
-      AVLNode<Key, Value>* temp_child = temp->getRight();
-      AVLNode<Key, Value>* temp_parent = temp->getParent();
-      if (temp_parent == NULL) {//no parent node
-        temp_child->setParent(NULL);
-        this->root_ = temp_child;
-      }
-      else {//has parent node
-        temp_child->setParent(temp_parent);
-        if (temp_parent->getLeft()==temp) {//left child
-          temp_parent->setLeft(temp_child);
-        }
-        else if (temp_parent->getRight()==temp){//right child
-          temp_parent->setRight(temp_child);
-        }
-      }
-      delete temp;
-    }
-    else if (temp->getRight()==NULL) {//single child
-      AVLNode<Key, Value>* temp_child = temp->getLeft();
-      AVLNode<Key, Value>* temp_parent = temp->getParent();
-      if (temp_parent==NULL) {
-        temp_child->setParent(NULL);
-        this->root_ = temp_child;
-      }
-      else {//has parent node
-        temp_child->setParent(temp_parent);
-        if (temp_parent->getLeft()==temp) {//left child
-          temp_parent->setLeft(temp_child);
-          temp_parent->updateBalance(1);
-        }
-        else if (temp_parent->getRight()==temp){//right child
-          temp_parent->setRight(temp_child);
-          temp_parent->updateBalance(-1);
-        }
-      }
-      delete temp;
-    }
-    else {//two children
-      AVLNode<Key, Value>* pred = (AVLNode<Key, Value>*)this->predecessor(temp);
-      nodeSwap(temp, pred);
-      remove(temp);
-    }
-}
-
 /*
  * Recall: The writeup specifies that if a node has 2 children you
  * should swap with the predecessor and then remove.
@@ -372,37 +288,102 @@ void AVLTree<Key, Value>:: remove(const Key& key)
     // TODO
     if (this->root_ == NULL) return;
     AVLNode<Key, Value>* temp = (AVLNode<Key, Value>*)this->internalFind(key);
-    //AVLNode<Key, Value>* temp_parent = temp->getParent();
+    AVLNode<Key, Value>* temp_parent = NULL;
     if (temp == NULL) return;
-    else remove(temp);
+    else {
+      temp_parent = temp->getParent();
+			if(temp->getLeft() != NULL && temp->getRight() != NULL) {//two children
+				AVLNode<Key, Value>* pred = (AVLNode<Key, Value>*)this->predecessor(temp);
+				nodeSwap(temp, pred);
+			}
+			if (temp->getLeft()==NULL && temp->getRight()==NULL) {//leaf node
+				temp_parent = temp->getParent();
+				if (temp_parent!=NULL) {//has parent node
+					if (temp_parent->getLeft() == temp) {//left child
+						temp_parent->setLeft(NULL);
+						temp_parent->updateBalance(1);
+					}
+					else if (temp_parent->getRight() == temp){//right child
+						temp_parent->setRight(NULL);
+						temp_parent->updateBalance(-1);
+					}
+				}
+				else {//empty tree after removal
+					this->root_ = NULL;
+				}
+				delete temp;
+			}
+			else if (temp->getLeft()==NULL) {//single child
+				AVLNode<Key, Value>* temp_child = temp->getRight();
+				AVLNode<Key, Value>* temp_parent = temp->getParent();
+				if (temp_parent == NULL) {//no parent node
+					temp_child->setParent(NULL);
+					this->root_ = temp_child;
+				}
+				else {//has parent node
+					temp_child->setParent(temp_parent);
+					if (temp_parent->getLeft()==temp) {//left child
+						temp_parent->setLeft(temp_child);
+						temp_parent->updateBalance(1);
+					}
+					else if (temp_parent->getRight()==temp){//right child
+						temp_parent->setRight(temp_child);
+						temp_parent->updateBalance(-1);
+					}
+				}
+				delete temp;
+			}
+			else if (temp->getRight()==NULL) {//single child
+				AVLNode<Key, Value>* temp_child = temp->getLeft();
+				temp_parent = temp->getParent();
+				if (temp_parent==NULL) {
+					temp_child->setParent(NULL);
+					this->root_ = temp_child;
+				}
+				else {//has parent node
+					temp_child->setParent(temp_parent);
+					if (temp_parent->getLeft()==temp) {//left child
+						temp_parent->setLeft(temp_child);
+						temp_parent->updateBalance(1);
+					}
+					else if (temp_parent->getRight()==temp){//right child
+						temp_parent->setRight(temp_child);
+						temp_parent->updateBalance(-1);
+					}
+				}
+				delete temp;
+			}
+    }
     //balancing
-    // while (temp_parent!=NULL) {
-    //   if (abs(temp_parent->getBalance()) == 2) {
-    //     if (temp_parent->getBalance() == -2) {
-    //       if(temp_parent->getLeft()->getBalance() == 1) {
-    //         leftRotate(temp_parent->getLeft());
-    //       }
-    //       rightRotate(temp_parent);
-    //     }
-    //     else if (temp_parent->getBalance() == 2) {
-    //       if(temp_parent->getLeft()->getBalance() == -1) {
-    //         rightRotate(temp_parent->getRight());
-    //       }
-    //       leftRotate(temp_parent);
-    //     }
-    //     temp_parent = temp_parent->getParent();
-    //   }
-    //   if (temp_parent->getBalance() == 1) break;
-    //   else if (temp_parent->getBalance() == -1) break;
-    //   temp = temp_parent;//update
-    //   temp_parent = temp_parent->getParent();
-    //   if (temp_parent!=NULL && temp==temp_parent->getLeft()) {
-    //     temp_parent->updateBalance(+1);
-    //   }
-    //   else if (temp_parent!=NULL && temp==temp_parent->getRight()) {
-    //     temp_parent->updateBalance(-1);
-    //   }
-    // }
+    while (temp_parent!=NULL) {
+      if (abs(temp_parent->getBalance()) == 2) {
+        if (temp_parent->getBalance() == -2) {
+          if(temp_parent->getLeft()->getBalance() == 1) {
+            leftRotate(temp_parent->getLeft());
+          }
+          rightRotate(temp_parent);
+        }
+        else if (temp_parent->getBalance() == 2) {
+          if(temp_parent->getRight()->getBalance() == -1) {
+            rightRotate(temp_parent->getRight());
+          }
+          leftRotate(temp_parent);
+        }
+        temp_parent = temp_parent->getParent();
+      }
+      if (temp_parent->getBalance() == 1) break;
+      else if (temp_parent->getBalance() == -1) break;
+      temp = temp_parent;//update
+      temp_parent = temp_parent->getParent();
+      if (temp_parent!=NULL) {
+        if (temp_parent->getLeft()==temp) {
+					temp_parent->updateBalance(1);
+				}
+      	else if (temp_parent->getRight()==temp) {
+        	temp_parent->updateBalance(-1);
+      	}
+    	}
+	}
 }
 
 template<class Key, class Value>
