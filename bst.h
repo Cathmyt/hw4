@@ -466,25 +466,25 @@ template<class Key, class Value>
 void BinarySearchTree<Key, Value>::insert(const std::pair<const Key, Value> &keyValuePair)
 {
     // TODO
-	Node<Key, Value>* temp = internalFind(keyValuePair.first);
-  if (temp != NULL) {
-    temp ->setValue(keyValuePair.second);
-  }
-	else if (root_ == NULL) {
-    root_ = new Node<Key, Value>(keyValuePair.first, keyValuePair.second, NULL);
-  }
-  else {//not empty tree, key not in the tree
-    temp = root_;
-    Node<Key, Value>* temp_parent = temp;
-    while (temp != NULL) {
-        temp_parent = temp;
-        if (keyValuePair.first > (temp->getKey())) {
-            temp = temp->getRight();
-        }
-        else if (keyValuePair.first < (temp->getKey())) {
-            temp = temp->getLeft();
-        }
+    Node<Key, Value>* temp = internalFind(keyValuePair.first);
+    if (temp != NULL) {//key already exist
+        temp ->setValue(keyValuePair.second);
     }
+	else if (root_ == NULL) {//no existing key & empty tree
+        root_ = new Node<Key, Value>(keyValuePair.first, keyValuePair.second, NULL);
+    }
+    else {//not empty tree, key not in the tree
+        temp = root_;
+        Node<Key, Value>* temp_parent = temp;
+        while (temp != NULL) {
+            temp_parent = temp;
+            if (keyValuePair.first > (temp->getKey())) {
+                temp = temp->getRight();
+            }
+            else if (keyValuePair.first < (temp->getKey())) {
+                temp = temp->getLeft();
+            }
+        }
     Node<Key, Value>* new_node = new Node<Key, Value>(keyValuePair.first, keyValuePair.second, temp_parent);
     if (keyValuePair.first > (temp_parent->getKey())) {
         temp_parent->setRight(new_node);
