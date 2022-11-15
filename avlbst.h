@@ -372,37 +372,37 @@ void AVLTree<Key, Value>:: remove(const Key& key)
     // TODO
     if (this->root_ == NULL) return;
     AVLNode<Key, Value>* temp = (AVLNode<Key, Value>*)this->internalFind(key);
-    AVLNode<Key, Value>* temp_parent = temp->getParent();
+    //AVLNode<Key, Value>* temp_parent = temp->getParent();
     if (temp == NULL) return;
     else remove(temp);
     //balancing
-    while (temp_parent!=NULL) {
-      if (abs(temp_parent->getBalance()) == 2) {
-        if (temp_parent->getBalance() == -2) {
-          if(temp_parent->getLeft()->getBalance() == 1) {
-            leftRotate(temp_parent->getLeft());
-          }
-          rightRotate(temp_parent);
-        }
-        else if (temp_parent->getBalance() == 2) {
-          if(temp_parent->getLeft()->getBalance() == -1) {
-            rightRotate(temp_parent->getRight());
-          }
-          leftRotate(temp_parent);
-        }
-        temp_parent = temp_parent->getParent();
-      }
-      if (temp_parent->getBalance() == 1) break;
-      else if (temp_parent->getBalance() == -1) break;
-      temp = temp_parent;//update
-      temp_parent = temp_parent->getParent();
-      if (temp_parent!=NULL && temp==temp_parent->getLeft()) {
-        temp_parent->updateBalance(+1);
-      }
-      else if (temp_parent!=NULL && temp==temp_parent->getRight()) {
-        temp_parent->updateBalance(-1);
-      }
-    }
+    // while (temp_parent!=NULL) {
+    //   if (abs(temp_parent->getBalance()) == 2) {
+    //     if (temp_parent->getBalance() == -2) {
+    //       if(temp_parent->getLeft()->getBalance() == 1) {
+    //         leftRotate(temp_parent->getLeft());
+    //       }
+    //       rightRotate(temp_parent);
+    //     }
+    //     else if (temp_parent->getBalance() == 2) {
+    //       if(temp_parent->getLeft()->getBalance() == -1) {
+    //         rightRotate(temp_parent->getRight());
+    //       }
+    //       leftRotate(temp_parent);
+    //     }
+    //     temp_parent = temp_parent->getParent();
+    //   }
+    //   if (temp_parent->getBalance() == 1) break;
+    //   else if (temp_parent->getBalance() == -1) break;
+    //   temp = temp_parent;//update
+    //   temp_parent = temp_parent->getParent();
+    //   if (temp_parent!=NULL && temp==temp_parent->getLeft()) {
+    //     temp_parent->updateBalance(+1);
+    //   }
+    //   else if (temp_parent!=NULL && temp==temp_parent->getRight()) {
+    //     temp_parent->updateBalance(-1);
+    //   }
+    // }
 }
 
 template<class Key, class Value>
